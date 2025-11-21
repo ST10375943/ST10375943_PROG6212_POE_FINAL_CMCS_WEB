@@ -1,0 +1,118 @@
+﻿@model IEnumerable<CMCS.Web.Models.Claim>
+
+@{
+    ViewData["Title"] = "Coordinator Dashboard";
+}
+
+<h2 class="mb-3">Coordinator – Pending Claims</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Lecturer</th>
+            <th>Email</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Hours</th>
+            <th>Rate</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.LecturerName</td>
+                <td>@item.LecturerEmail</td>
+                <td>@item.Month</td>
+                <td>@item.Year</td>
+                <td>@item.HoursWorked</td>
+                <td>@item.HourlyRate</td>
+                <td>@item.TotalAmount.ToString("0.00")</td>
+                <td>@item.Status</td>
+                <td>
+                    <button class="btn btn-success btn-sm"
+                            onclick="openCoordinatorModal(@item.Id, 'Approve')">
+                        Approve
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            onclick="openCoordinatorModal(@item.Id, 'Reject')">
+                        Reject
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- MODAL -->
+<div class="modal fade" id="coordinatorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+
+                <div id="commentSection">
+                    <label>Reason (optional):</label>
+                    <textarea id="modalComment" class="form-control"></textarea>
+                </div>
+
+                <input type="hidden" id="actionType" />
+                <input type="hidden" id="claimId" />
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCoordinatorAction()">Confirm</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openCoordinatorModal(id, action) {
+
+            document.getElementById("claimId").value = id;
+            document.getElementById("actionType").value = action;
+
+            let msg = action === "Approve"
+                ? "Are you sure you want to <strong>Approve</strong> this claim?"
+                : "Are you sure you want to <strong>Reject</strong> this claim?";
+
+            document.getElementById("modalMessage").innerHTML = msg;
+
+            var modal = new bootstrap.Modal(document.getElementById('coordinatorModal'));
+            modal.show();
+        }
+
+        function submitCoordinatorAction() {
+            let id = document.getElementById("claimId").value;
+            let action = document.getElementById("actionType").value;
+            let comment = document.getElementById("modalComment").value;
+
+            window.location.href =
+                `/Coordinator/${action}?id=${id}&comment=${encodeURIComponent(comment)}`;
+        }
+    </script>
+}

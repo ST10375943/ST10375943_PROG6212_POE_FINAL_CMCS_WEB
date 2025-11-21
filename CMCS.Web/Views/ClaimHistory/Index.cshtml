@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CMCS.Web.Models.Claim>
+
+@{
+    ViewData["Title"] = "Claim History";
+}
+
+<h2 class="mb-3">Complete Claim History</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Lecturer</th>
+            <th>Email</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Coordinator Comments</th>
+            <th>HR Comments</th>
+            <th>Date Submitted</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            string badge = item.Status switch
+            {
+                ClaimStatus.Pending => "badge bg-secondary",
+                ClaimStatus.ApprovedByCoordinator => "badge bg-primary",
+                ClaimStatus.RejectedByCoordinator => "badge bg-danger",
+                ClaimStatus.ProcessedByHR => "badge bg-success",
+                ClaimStatus.RejectedByHR => "badge bg-warning text-dark",
+                _ => "badge bg-dark"
+            };
+
+            <tr>
+                <td>@item.LecturerName</td>
+                <td>@item.LecturerEmail</td>
+                <td>@item.Month</td>
+                <td>@item.Year</td>
+                <td>R @item.TotalAmount.ToString("0.00")</td>
+                <td><span class="@badge">@item.Status</span></td>
+                <td>@item.CoordinatorComments</td>
+                <td>@item.HRComments</td>
+                <td>@item.SubmittedDate.ToString("yyyy-MM-dd HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,53 @@
+﻿@model CMCS.Web.Models.Claim
+
+<h2>Submit Claim</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label>Lecturer Name</label>
+        <input asp-for="LecturerName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Lecturer Email</label>
+        <input asp-for="LecturerEmail" class="form-control" />
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <label>Month</label>
+            <input asp-for="Month" class="form-control" />
+        </div>
+        <div class="col-6">
+            <label>Year</label>
+            <input asp-for="Year" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mb-3 mt-3">
+        <label>Hours Worked</label>
+        <input asp-for="HoursWorked" id="hours" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Hourly Rate</label>
+        <input asp-for="HourlyRate" id="rate" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Total</label>
+        <input id="total" class="form-control" readonly />
+    </div>
+
+    <button class="btn btn-success">Submit</button>
+</form>
+
+<script>
+    function calc() {
+        let h = parseFloat(document.getElementById("hours").value) || 0;
+        let r = parseFloat(document.getElementById("rate").value) || 0;
+        document.getElementById("total").value = (h * r).toFixed(2);
+    }
+    document.getElementById("hours").oninput = calc;
+    document.getElementById("rate").oninput = calc;
+</script>

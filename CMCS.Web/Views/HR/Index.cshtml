@@ -1,0 +1,116 @@
+﻿@model IEnumerable<CMCS.Web.Models.Claim>
+
+@{
+    ViewData["Title"] = "HR Processing";
+}
+
+<h2 class="mb-3">HR – Claims Ready for Processing</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Lecturer</th>
+            <th>Email</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Total</th>
+            <th>Coordinator Note</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.LecturerName</td>
+                <td>@item.LecturerEmail</td>
+                <td>@item.Month</td>
+                <td>@item.Year</td>
+                <td>@item.TotalAmount.ToString("0.00")</td>
+                <td>@item.CoordinatorComments</td>
+                <td>@item.Status</td>
+                <td>
+                    <button class="btn btn-success btn-sm"
+                            onclick="openHRModal(@item.Id, 'Approve')">
+                        Approve
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            onclick="openHRModal(@item.Id, 'Reject')">
+                        Reject
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<!-- HR Modal -->
+<div class="modal fade" id="hrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">HR Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p id="hrModalMessage"></p>
+
+                <label>HR Notes (optional):</label>
+                <textarea id="hrModalComment" class="form-control"></textarea>
+
+                <input type="hidden" id="hrActionType" />
+                <input type="hidden" id="hrClaimId" />
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" onclick="submitHRAction()">Confirm</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        function openHRModal(id, action) {
+
+            document.getElementById("hrClaimId").value = id;
+            document.getElementById("hrActionType").value = action;
+
+            let msg = action === "Approve"
+                ? "Process this claim and mark it as <strong>Approved by HR</strong>?"
+                : "Reject this claim and notify the Coordinator/Lecturer?";
+
+            document.getElementById("hrModalMessage").innerHTML = msg;
+
+            var modal = new bootstrap.Modal(document.getElementById('hrModal'));
+            modal.show();
+        }
+
+        function submitHRAction() {
+            let id = document.getElementById("hrClaimId").value;
+            let action = document.getElementById("hrActionType").value;
+            let comment = document.getElementById("hrModalComment").value;
+
+            window.location.href =
+                `/HR/${action}?id=${id}&comment=${encodeURIComponent(comment)}`;
+        }
+    </script>
+}
